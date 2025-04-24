@@ -4,7 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Config:
+<<<<<<< HEAD
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://survey-form:5678@localhost/survey_db" # DB 연결
+=======
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://survey_form:5678@localhost/survey_form" # DB 연결
+>>>>>>> feature/route
     SQLALCHEMY_TRACK_MODIFICATIONS = False # 데이터 변경 사항 추척 기능 비활성화 (메모리 사용량 절약)
     SQLALCHEMY_POOL_SIZE = 10 # 동시 연결 가능한 최대 커넥션 개수
     SQLALCHEMY_POOL_TIMEOUT = 5 # 5초 내에 DB 연결 실패 시 오류 발생
