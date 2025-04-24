@@ -17,6 +17,7 @@ def signup():
     user = create_user(name, email, gender, age)
 
     # 성공 시 응답 메시지와 사용자 ID 반환
+    # 이미 app/__init__.py에서 아래와 같이 400 에러를 JSON으로 반환하도록 핸들러를 등록되어 있어 설정 X
     return jsonify({
         "message": f"{user.name}님 회원가입을 축하합니다",
         "user_id": user.id
