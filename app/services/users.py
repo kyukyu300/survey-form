@@ -1,3 +1,4 @@
+#사용자 조회 만들기
 from config import db
 from app.models import User
 
