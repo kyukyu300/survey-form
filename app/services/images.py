@@ -7,4 +7,4 @@ def create_image(url):
     return new_image.to_dict
 
 def get_all_image(url):
-    return  [Image.to_dict() for image in Image.query.all()]
+    return  [image.to_dict() for image in Image.query.all()]
