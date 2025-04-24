@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #사용자 조회 만들기
 from config import db
 from app.models import User
@@ -14,7 +13,6 @@ def get_user_by_email(email):
 #전체 조회
 def get_all_users():
     return User.query.all()
-=======
 from config import db
 from app.models import User
 
@@ -28,4 +26,3 @@ def create_user(name, email, gender, age):
     db.session.commit()
 
     return user
->>>>>>> feature/add-survey
