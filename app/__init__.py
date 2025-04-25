@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_migrate import Migrate
 
 import app.models
-from app.routes import routes
+from app.routes import bp
 from config import db
 
 migrate = Migrate()
@@ -26,7 +26,7 @@ def create_app():
         return response
 
 		# 블루프린트 등록
-    application.register_blueprint(routes)
+    application.register_blueprint(bp, url_prefix = '/api')
 
 
     return application
