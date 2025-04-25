@@ -3,7 +3,7 @@ from app.services.images import create_image
 from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
 from app.services.answers import submit_answer
-from app.services.choices import create_choices, get_choices
+from app.services.choices import get_choices
 from app.models import Image,Choices,Question
 from config import db
 
@@ -19,12 +19,14 @@ def get_API():
 @bp.route('/image/main', methods = ["GET"])
 def get_main_image():
     main_image = Image.query.filter_by(type="main").first()
+    if not main_image:
+        return jsonify({"error": "Main image not found"}), 404
     return jsonify({"image": main_image.url})
 
 # 질문 가져오기
 @bp.route('/questions/<int:question_id>', methods = ['GET'])
-def get_question():
-    question = get_question_by_id()
+def get_question(question_id):
+    question = get_question_by_id(question_id)
     if question:
         return jsonify(question)
     else:
@@ -32,9 +34,9 @@ def get_question():
     
 # 질문 개수 확인
 @bp.route('/questions/count', methods = ["GET"])
-def get_question_count():
-    all_questions = get_all_questions()
-    return jsonify({"total": all_questions.count()})
+def get_question_count(question_id):
+    all_questions = get_all_questions(question_id)
+    return jsonify({"total": len(all_questions)})
     
 # 선택지 가져오기
 @bp.route('/choice/<int:question_id>', methods = ["GET"])
@@ -63,9 +65,9 @@ def submit_choice():
 def create_new_image():
     data = request.get_json()
     url = data.get("url")
-    image_type = data.get("type")
+    type_value = data.get("type")
 
-    image_id = create_image(url,image_type=image_type)
+    image_id = create_image(url,image_type=type_value)
     if image_id is None:
         return jsonify({"Message": "Failed to create image"})
     return jsonify({"message": f"ID: {image_id} Image Success Create"}), 201
@@ -74,21 +76,25 @@ def create_new_image():
 @bp.route('/question', methods = ["POST"])
 def create_question():
     data = request.get_json()
-    title = data.get('title')  # 질문 내용
+    title = data.get('title')
+    sqe = data.get('sqe')
+    image_id = data.get('image_id')  
 
-    if not title: # 오류
-        abort(400, "질문 내용(title)이 필요합니다.")
+    if not title or sqe is None or not image_id:
+        abort(400, "필수 값이 누락되었습니다: title, sqe, image_id")
 
-    question = Question(title=title)
+    question = Question(title=title, sqe=sqe, image_id=image_id)
 
     db.session.add(question)
     db.session.commit()
     # 성공시 메시지와 생성한 질문 id와 내용을 보여줌
     return jsonify({
-        "message": f"Title: {question.id} question Success Create",
+        "message": f"Question(ID: {question.id}) successfully created",
         "question": {
             "id": question.id,
             "title": question.title,
+            "sqe": question.sqe,
+            "image_id": question.image_id
         }
     }), 201
 
