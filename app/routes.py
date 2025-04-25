@@ -81,7 +81,7 @@ def create_choice():
     db.session.commit()      # 실제로 저장
 
     return jsonify({
-        "message": f"선택지(ID: {choice.id})가 생성되었습니다.",
+        "message": f"Content: {choice.id} choice Success Create",
         "choice": choice.to_dict()  
     }), 201
 
