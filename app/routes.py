@@ -78,12 +78,13 @@ def create_question():
     data = request.get_json()
     title = data.get('title')
     sqe = data.get('sqe')
-    image_id = data.get('image_id')  
+    image_id = data.get('image_id')
+    is_active = data.get('is_active', True)  
 
     if not title or sqe is None or not image_id:
         abort(400, "필수 값이 누락되었습니다: title, sqe, image_id")
 
-    question = Question(title=title, sqe=sqe, image_id=image_id)
+    question = Question(title=title, sqe=sqe, image_id=image_id, is_active=is_active)
 
     db.session.add(question)
     db.session.commit()
@@ -105,12 +106,13 @@ def create_choice():
     content = data.get('content')  #선택지 내용         
     sqe = data.get('sqe')  # 선택지 순서                 
     question_id = data.get('question_id')  # 어떤 질문의 선택지인지  
+    is_active = data.get('is_active', True)
 
     # content, sqe, question_id 이 빠졌을때 오류
     if not content or sqe is None or not question_id:
         abort(400, "필수 값이 누락되었습니다: content, sqe, question_id")
 
-    choice = Choices(content=content, sqe=sqe, question_id=question_id)
+    choice = Choices(content=content, sqe=sqe, question_id=question_id, is_active=is_active)
 
     db.session.add(choice)   # 선택지를 DB에 추가
     db.session.commit()      # 실제로 저장
