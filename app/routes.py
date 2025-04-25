@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, request
 from app.services.images import create_image
 from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
-from models import Image
+from app.services.answers import submit_answer
+from app.services.choices import create_choices, get_choices
+from app.models import Image
 
 # 사용자 회원가입용 블루프린트 생성
 bp = Blueprint("routes", __name__)
@@ -35,16 +37,24 @@ def get_question_count():
     
 # 선택지 가져오기
 @bp.route('/choice/<int:question_id>', methods = ["GET"])
-def get_choice():
-    pass
+def get_choice(question_id):
+    choice = get_choices(question_id)
+    return jsonify({"choices": choice})
+
 
 # 답변 제출하기
 @bp.route('/submit', methods = ["POST"])
 def submit_choice():
     data = request.get_json()
-    pass
-    # user_id = 함수(data)
-    #return jsonify({"message": f"User: {user_id}'s answers Success Create"})
+    user_id = None # 공통으로 사용될 user_id 저장용
+
+    for item in data:
+        user_id = item.get("user_id")
+        choice_id = item.get("choice_id")
+        result = submit_answer(user_id, choice_id)
+        if result is None:
+            return jsonify({"message": "Failed to create answers"})
+    return jsonify({"message": f"User: {user_id}'s answers Success Create"})
 
 
 # 이미지 생성
@@ -55,6 +65,8 @@ def create_new_image():
     image_type = data.get("type")
 
     image_id = create_image(url,image_type=image_type)
+    if image_id is None:
+        return jsonify({"Message": "Failed to create image"})
     return jsonify({"message": f"ID: {image_id} Image Success Create"}), 201
 
 # 질문 생성
@@ -63,9 +75,22 @@ def create_question():
     pass
 
 # 선택지 생성
-@bp.route('/choice', methods = ["POST"])
+@bp.route('/choice', methods=["POST"])
 def create_choice():
-    pass
+    data = request.get_json()
+    created_choices = []  
+    for item in data:
+        content = item.get("content")
+        sqe = item.get("sqe")
+        question_id = item.get("question_id")
+        is_active = item.get("is_active", True)
+        result = create_choices(content, sqe, question_id, is_active)
+        if result:
+            created_choices.append(result.content)
+        else:
+            return jsonify({"message": "Failed to create some choices"})
+    
+    return jsonify({"Message": f"Content: {result.content} choice Success Create"})
 
 # 회원가입
 @bp.route('/signup', methods=['POST'])
