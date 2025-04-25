@@ -1,7 +1,7 @@
-# 심리테스트 검사 폼 만들기
+# 📋 심리테스트 검사 폼 만들기
 **간단한 몇가지 질문을 통하여 성향 테스트를 할 수 있는 웹 애플리케이션입니다.**
 
-## 프로젝트 파일 구조
+## 📌 프로젝트 파일 구조
 ```bash
 /
 ├── run.py             # 앱 실행 스크립트 (개발용)
@@ -19,13 +19,13 @@
 │       └── users.py     # 사용자 관련 서비스
 ```
 
-## 설치 방법 
+## ⤵️ 설치 방법 
 ```bash
 git clone https://github.com/kyukyu300/survey-form.git  # 프로젝트 파일 복제하기
 cd survey-form                                          # 파일 위치로 이동
 ```
 
-## 가상환경 활성화
+## ✴️ 가상환경 활성화
 ```bash
 # 가상환경 생성
 python -m venv .venv      
@@ -34,11 +34,11 @@ source .venv/bin/activate   # mac / Linux
 .venv\Scripts\activate      # Windows
 ```
 
-## 의존성 설치
+## ⤵️ 의존성 설치
 ```bash
 pip install -r requirements.txt
 ```
-## 실행 방법
+## ▶️ 실행 방법
 ```bash
 python run.py  # 개발환경
 python wsgi.py # 배포
