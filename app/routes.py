@@ -90,7 +90,7 @@ def create_question():
     db.session.commit()
     # 성공시 메시지와 생성한 질문 id와 내용을 보여줌
     return jsonify({
-        "message": f"Question(ID: {question.id}) successfully created",
+        "message":  f"Title: {question.id} question Success Create",
         "question": {
             "id": question.id,
             "title": question.title,
