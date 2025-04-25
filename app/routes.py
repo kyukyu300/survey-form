@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
-from app.services.images import get_all_image, create_image
+from app.services.images import create_image
 from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
+from models import Image
 
 # 사용자 회원가입용 블루프린트 생성
 bp = Blueprint("routes", __name__)
@@ -13,9 +14,9 @@ def get_API():
 
 # 메인 이미지 가져오기
 @bp.route('/image/main', methods = ["GET"])
-def get_image():
-    all_image = get_all_image()
-    return jsonify({"image": all_image[0].url})
+def get_main_image():
+    main_image = Image.query.filter_by(type="main").first()
+    return jsonify({"image": main_image.url})
 
 # 질문 가져오기
 @bp.route('/questions/<int:question_id>', methods = ['GET'])
@@ -51,8 +52,9 @@ def submit_choice():
 def create_new_image():
     data = request.get_json()
     url = data.get("url")
+    image_type = data.get("type")
 
-    image_id = create_image(url)
+    image_id = create_image(url,image_type=image_type)
     return jsonify({"message": f"ID: {image_id} Image Success Create"}), 201
 
 # 질문 생성
