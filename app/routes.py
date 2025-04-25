@@ -3,6 +3,7 @@ from app.services.images import create_image
 from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
 from app.models import Image,Choices
+from app.services.questions import Question
 from config import db
 
 # 사용자 회원가입용 블루프린트 생성
@@ -61,7 +62,24 @@ def create_new_image():
 # 질문 생성
 @bp.route('/question', methods = ["POST"])
 def create_question():
-    pass
+    data = request.get_json()
+    title = data.get('title')  # 질문 내용
+
+    if not title: # 오류
+        abort(400, "질문 내용(title)이 필요합니다.")
+
+    question = Question(title=title)
+
+    db.session.add(question)
+    db.session.commit()
+    # 성공시 메시지와 생성한 질문 id와 내용을 보여줌
+    return jsonify({
+        "message": f"Title: {question.id} question Success Create",
+        "question": {
+            "id": question.id,
+            "title": question.title,
+        }
+    }), 201
 
 # 선택지 생성
 @bp.route('/choice', methods = ["POST"])
@@ -79,9 +97,9 @@ def create_choice():
 
     db.session.add(choice)   # 선택지를 DB에 추가
     db.session.commit()      # 실제로 저장
-
+    # 성공 시 메세지와 딕셔너리 형태로 변환해서 JSON으로 보여줌
     return jsonify({
-        "message": f"Content: {choice.id} choice Success Create",
+        "message": f"Content: {choice.id} choice Success",
         "choice": choice.to_dict()  
     }), 201
 
