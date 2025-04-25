@@ -26,7 +26,7 @@ def create_app():
         return response
 
 		# 블루프린트 등록
-    application.register_blueprint(bp, url_prefix = '/api')
+    application.register_blueprint(bp)
 
 
     return application
