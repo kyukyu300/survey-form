@@ -43,3 +43,5 @@ pip install -r requirements.txt
 python run.py  # 개발환경
 python wsgi.py # 배포
 ```
+## 실행 화면
+추가 예정
