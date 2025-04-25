@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort
 from app.services.images import create_image
 from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
-from models import Image
+from app.models import Image,Choices
+from config import db
 
 # 사용자 회원가입용 블루프린트 생성
 bp = Blueprint("routes", __name__)
@@ -65,7 +66,24 @@ def create_question():
 # 선택지 생성
 @bp.route('/choice', methods = ["POST"])
 def create_choice():
-    pass
+    data = request.get_json()
+    content = data.get('content')  #선택지 내용         
+    sqe = data.get('sqe')  # 선택지 순서                 
+    question_id = data.get('question_id')  # 어떤 질문의 선택지인지  
+
+    # content, sqe, question_id 이 빠졌을때 오류
+    if not content or sqe is None or not question_id:
+        abort(400, "필수 값이 누락되었습니다: content, sqe, question_id")
+
+    choice = Choices(content=content, sqe=sqe, question_id=question_id)
+
+    db.session.add(choice)   # 선택지를 DB에 추가
+    db.session.commit()      # 실제로 저장
+
+    return jsonify({
+        "message": f"선택지(ID: {choice.id})가 생성되었습니다.",
+        "choice": choice.to_dict()  
+    }), 201
 
 # 회원가입
 @bp.route('/signup', methods=['POST'])
