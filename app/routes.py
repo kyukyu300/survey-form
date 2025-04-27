@@ -4,9 +4,10 @@ from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
 from app.services.answers import submit_answer
 from app.services.choices import get_choices
-from app.models import Image,Choices,Question, User, Answer
+from app.models import Image,Choices,Question
 from config import db
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import HTTPException
 
 # 사용자 회원가입용 블루프린트 생성
 bp = Blueprint("routes", __name__)
@@ -123,6 +124,9 @@ def create_new_image():
             # ValueError: 이미지 생성 실패 시
             raise ValueError("Failed to create image")
         return jsonify({"message": f"ID: {image_id} Image Success Create"}), 201
+    except HTTPException as e:
+        db.session.rollback()  # HTTPException 처리 시 세션 롤백
+        return jsonify({"error": e.description}), e.code
     except ValueError as e:
         # ValueError: 입력값 검증 실패 처리
         return jsonify({"error": str(e)}), 400
