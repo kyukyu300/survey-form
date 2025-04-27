@@ -4,7 +4,7 @@ from app.services.questions import get_question_by_id, get_all_questions
 from app.services.users import create_user
 from app.services.answers import submit_answer
 from app.services.choices import get_choices
-from app.models import Image,Choices,Question
+from app.models import Image,Choices,Question, User, Answer
 from config import db
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -14,7 +14,7 @@ bp = Blueprint("routes", __name__)
 # 기본 연결 확인
 @bp.route('/', methods = ["GET"])
 def get_API():
-    return jsonify({"message": "Success Connect"})
+    return jsonify({"message": "Success Connect"}), 200
 
 # 메인 이미지 가져오기
 @bp.route('/image/main', methods = ["GET"])
@@ -37,10 +37,10 @@ def get_main_image():
 def get_question(question_id):
     try:
         question = get_question_by_id(question_id)
-        if not question:
+        if not question or not question.is_active:
             # 해당 ID의 질문이 없을 경우 404 처리
             return jsonify({"error": "Question not found"}), 404
-        return jsonify(question), 200
+        return jsonify(question.to_dict()), 200
     except SQLAlchemyError:
         # SQLAlchemyError: DB 처리 중 에러 발생 시 처리
         return jsonify({"error": "Database error"}), 500
@@ -48,7 +48,7 @@ def get_question(question_id):
         # Exception: 예기치 못한 오류 전반 처리
         return jsonify({"error": "Internal server error"}), 500
     
-# 질문 개수 확인
+# 질문 개수 확인 (활성된 항목만)
 @bp.route('/questions/count', methods = ["GET"])
 def get_question_count():
     # 모든 질문을 조회하여 총 개수를 반환하기 때문에 매개변수가 필요 없어서 제거
@@ -88,6 +88,8 @@ def submit_choice():
         for item in data:
             user_id = item.get("user_id")
             choice_id = item.get("choice_id")
+            if not user_id or not choice_id:  # 필드 누락 검증
+                raise ValueError("user_id 또는 choice_id가 누락되었습니다")
             result = submit_answer(user_id, choice_id)
             if result is None:
                 # 답변 생성 실패 시
@@ -112,11 +114,11 @@ def create_new_image():
     try:
         data = request.get_json()
         url = data.get("url")
-        type_value = data.get("type")
-        if not url or not type_value:
+        image_type = data.get("type")
+        if not url or not image_type:
             # ValueError: 필수 값 누락 시
             raise ValueError("필수 값이 누락되었습니다: url, type")
-        image_id = create_image(url, image_type=type_value)
+        image_id = create_image(url, image_type=image_type)   
         if image_id is None:
             # ValueError: 이미지 생성 실패 시
             raise ValueError("Failed to create image")
@@ -214,7 +216,9 @@ def signup():
         if not name or not email or age is None or not gender:
             # ValueError: 필수 값 누락 시
             raise ValueError("필수 값이 누락되었습니다: name, email, gender, age")
-        user = create_user(name, email, gender, age)
+        user = create_user(name=name, age=age, gender=gender, email=email)
+        db.session.add(user)
+        db.session.commit()
         return jsonify({
             "message": f"{user.name}님 회원가입을 축하합니다",
             "user_id": user.id
