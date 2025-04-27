@@ -74,10 +74,10 @@ class Image(CommonModel):
     def __init__(self, url, image_type):
         allowed_type = {"main", "sub"}
         if image_type not in allowed_type:
-            abort(400, f"Invalid type: {type}. Allowed values: {allowed_type}")
+            abort(400, f"Invalid type: {image_type}. Allowed values: {allowed_type}") 
 
         self.url = url
-        self.type = type
+        self.type = image_type
 
     questions = db.relationship("Question", back_populates="image")
 
