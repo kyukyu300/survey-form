@@ -8,11 +8,7 @@ def get_all_questions():
 
 # 질문 하나씩 조회
 def get_question_by_id(question_id):
-    question = Question.query.get(question_id)
-    if question:
-        return question.to_dict() 
-    else:
-        None
+    return Question.query.get(question_id)
 
 # 질문 생성
 def create_question(title, sqe, image_id, is_active=True):
