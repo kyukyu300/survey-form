@@ -41,7 +41,9 @@ def get_question(question_id):
         if not question or not question.is_active:
             # 해당 ID의 질문이 없을 경우 404 처리
             return jsonify({"error": "Question not found"}), 404
-        return jsonify(question.to_dict()), 200
+        result = question.to_dict()
+        result["choices"] = get_choices(question_id)
+        return jsonify(result), 200
     except SQLAlchemyError:
         # SQLAlchemyError: DB 처리 중 에러 발생 시 처리
         return jsonify({"error": "Database error"}), 500
