@@ -3,7 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 # 특정 질문의 선택지 조회
 def get_choices(question_id):
-    return [choice.to_dict() for choice in Choices.query.filter_by(question_id=question_id).all()]
+    choices = Choices.query.filter_by(question_id=question_id).all()
+    return [choice.to_dict() for choice in choices]
 
 # 선택지 생성
 def create_choices(content, sqe, question_id, is_active = True):
